@@ -29,7 +29,9 @@ export class AppService {
       `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=${part}&appid=${process.env.WEATHER_API_KEY}`,
     );
 
-    await this.saveCurrentWeather(weatherData.data?.current, lat, lon);
+    if (weatherData.data && weatherData.data?.current) {
+      await this.saveCurrentWeather(weatherData.data.current, lat, lon);
+    }
 
     if (weatherData.data?.hourly && weatherData.data?.hourly.length > 0) {
       await this.saveHourlyWeather(weatherData.data.hourly, lat, lon);
@@ -39,7 +41,7 @@ export class AppService {
       await this.saveDailyWeather(weatherData.data.daily, lat, lon);
     }
 
-    return weatherData.data;
+    return { message: 'The data is saved to the database' };
   }
 
   async saveCurrentWeather(data: any, lat: number, lon: number) {
@@ -138,6 +140,8 @@ export class AppService {
       where: { lat, lon },
       select: { createdAt: true },
     });
+
+    if (!isWeatherExists) return;
 
     const startDayDate = moment().startOf('day');
 

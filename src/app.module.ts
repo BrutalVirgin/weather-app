@@ -6,8 +6,6 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { CurrentWeatherEntity } from './entity/current-weather.entity';
 import { HourlyWeatherEntity } from './entity/hourly-weather.entity';
 import { DailyWeatherEntity } from './entity/daily-weather.entity';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { TransformationInterceptor } from './interceptors/weather.interceptor';
 
 @Module({
   imports: [
@@ -28,18 +26,12 @@ import { TransformationInterceptor } from './interceptors/weather.interceptor';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_NAME'),
           synchronize: true,
-          entities: [__dirname + '/**/*.entity{.js, .ts}'],
+          entities: [__dirname + '/**/*.entity.{js,ts}'],
         }) as TypeOrmModuleOptions,
       inject: [ConfigService],
     }),
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformationInterceptor,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}
